@@ -19,8 +19,23 @@ class Parser:
 
         return float(self.text[start:self.pos])
 
+    def factor(self):
+        if self.pos < len(self.text) and self.text[self.pos] == "(":
+            self.pos += 1
+
+            result = self.expression()
+
+            if self.pos >= len(self.text) or self.text[self.pos] != ")":
+                raise ValueError("Expected ')'")
+
+            self.pos += 1
+
+            return result
+
+        return self.number()
+
     def term(self):
-        result = self.number()
+        result = self.factor()
 
         while self.pos < len(self.text):
             op = self.text[self.pos]
@@ -29,7 +44,7 @@ class Parser:
                 break
 
             self.pos += 1
-            right = self.number()
+            right = self.factor()
 
             if op == "*":
                 result *= right
@@ -56,4 +71,3 @@ class Parser:
                 result -= right
 
         return result
-        
